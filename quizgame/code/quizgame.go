@@ -3,6 +3,7 @@ package quizgame
 import (
 	"bufio"
 	"encoding/csv"
+	"flag"
 	"fmt"
 	"log"
 	"math/rand"
@@ -16,14 +17,20 @@ type QuizData struct {
 }
 
 func RunQuizgame() {
+
+	timeLimit := flag.Int("limit", 30, "the time limit for the quiz in seconds")
+	shuffleQuestions := flag.Bool("shuffle", false, "shuffle the quiz questions")
+
+	flag.Parse()
+
+	print(*timeLimit, *shuffleQuestions)
+
 	f, err := os.Open("problems.csv")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer f.Close()
-
 	csvReader := csv.NewReader(f)
-	score := 0
 	stringifiedQuizData, err := csvReader.ReadAll()
 	if err != nil {
 		panic("Could't read the data")
@@ -33,12 +40,14 @@ func RunQuizgame() {
 	for _, data := range stringifiedQuizData {
 		quizData = append(quizData, QuizData{data[0], data[1]})
 	}
-	randomGame := true
-	if randomGame {
+
+	if *shuffleQuestions {
 		rand.Shuffle(len(quizData), func(i, j int) { quizData[i], quizData[j] = quizData[j], quizData[i] })
 	}
+
 	numberOfQuestions := len(quizData)
-	timer := time.NewTimer(30 * time.Second)
+	score := 0
+	timer := time.NewTimer(time.Duration(*timeLimit) * time.Second)
 	for index, data := range quizData {
 		select {
 		case <-timer.C:
