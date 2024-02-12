@@ -3,3 +3,4 @@ go 1.21.5
 use ./quizgame
 use ./html-link-parser
 use ./url-shortener
+use ./choose-your-own-adventure
