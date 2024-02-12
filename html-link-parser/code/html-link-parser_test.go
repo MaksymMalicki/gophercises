@@ -100,7 +100,7 @@ func TestHtmlLinkParser(t *testing.T) {
 	for _, testSuite := range testSuites {
 		t.Run(testSuite.label, func(t *testing.T) {
 			got := ParseHTML(strings.NewReader(testSuite.input))
-			if reflect.DeepEqual(got, testSuite.output) {
+			if !reflect.DeepEqual(got, testSuite.output) {
 				t.Errorf("Got %v, expected %v", got, testSuite.output)
 			}
 		})

@@ -29,11 +29,6 @@ func ParseHTML(buffer io.Reader) []Link {
 	}
 	links := []Link{}
 	findLinkNodes(doc, &links)
-	print("\n\n")
-	for _, l := range links {
-		print(l.href, " ", l.text, "\n")
-	}
-	print("\n\n")
 	return links
 }
 
@@ -53,10 +48,11 @@ func createLinkFromNode(n *html.Node) Link {
 	for _, a := range n.Attr {
 		if a.Key == "href" {
 			href = a.Val
+			break
 		}
 	}
 	expandLinkNodeChildren(n, &result)
-	return Link{text: strings.TrimSpace(result), href: href}
+	return Link{text: strings.Join(strings.Fields(result), " "), href: href}
 }
 
 func expandLinkNodeChildren(n *html.Node, result *string) string {
