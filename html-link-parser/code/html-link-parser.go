@@ -13,13 +13,12 @@ type Link struct {
 	text string
 }
 
-func ReadExampleHTML() io.Reader {
-	f, err := os.ReadFile("./examples/ex1.html")
+func ReadExampleHTML(path string) io.Reader {
+	f, err := os.ReadFile(path)
 	if err != nil {
 		panic("Could't open the file")
 	}
 	htmlString := strings.TrimSpace(string(f))
-	print(htmlString)
 	return strings.NewReader(htmlString)
 }
 
@@ -29,24 +28,26 @@ func ParseHTML(buffer io.Reader) []Link {
 		panic("Could't parse the HTML")
 	}
 	links := []Link{}
-	traverseHTMLTree(doc, &links)
+	findLinkNodes(doc, &links)
+	print("\n\n")
 	for _, l := range links {
-		print(l.href, " ", l.text)
+		print(l.href, " ", l.text, "\n")
 	}
+	print("\n\n")
 	return links
 }
 
-func traverseHTMLTree(n *html.Node, links *[]Link) []Link {
+func findLinkNodes(n *html.Node, links *[]Link) []Link {
 	if n.Type == html.ElementNode && n.Data == "a" {
-		*links = append(*links, retrieveATagData(n))
+		*links = append(*links, createLinkFromNode(n))
 	}
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		traverseHTMLTree(c, links)
+		findLinkNodes(c, links)
 	}
 	return nil
 }
 
-func retrieveATagData(n *html.Node) Link {
+func createLinkFromNode(n *html.Node) Link {
 	var href string = ""
 	var result string = ""
 	for _, a := range n.Attr {
@@ -54,18 +55,17 @@ func retrieveATagData(n *html.Node) Link {
 			href = a.Val
 		}
 	}
-	expandATagChildren(n, &result)
+	expandLinkNodeChildren(n, &result)
 	return Link{text: strings.TrimSpace(result), href: href}
 }
 
-func expandATagChildren(n *html.Node, result *string) string {
-	print("type: ", n.Type, " data: ", n.Data, "\n")
+func expandLinkNodeChildren(n *html.Node, result *string) string {
 	if n.Type == html.TextNode {
 		*result += n.Data + " "
 		return *result
 	}
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		expandATagChildren(c, result)
+		expandLinkNodeChildren(c, result)
 	}
 	return *result
 }

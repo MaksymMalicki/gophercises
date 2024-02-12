@@ -80,6 +80,22 @@ func TestHtmlLinkParser(t *testing.T) {
 				},
 			},
 		},
+		{
+			label: "Complex HTML with comments",
+			input: `
+				<html>
+				<body>
+				<a href="/dog-cat">dog cat <!-- commented text SHOULD NOT be included! --></a>
+				</body>
+				</html>
+			`,
+			output: []Link{
+				{
+					href: "/dog-cat",
+					text: "dog cat",
+				},
+			},
+		},
 	}
 	for _, testSuite := range testSuites {
 		t.Run(testSuite.label, func(t *testing.T) {
