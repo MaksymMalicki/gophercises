@@ -4,3 +4,4 @@ use ./quizgame
 use ./html-link-parser
 use ./url-shortener
 use ./choose-your-own-adventure
+use ./cli-task-manager
